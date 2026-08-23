@@ -7,109 +7,86 @@ if (!isset($_SESSION["user_id"])) {
     exit();
 }
 
-
 $message = "";
-$success = false;
+
+$result = mysqli_query($conn, "SELECT id FROM laptop ORDER BY id DESC LIMIT 1");
+$row = mysqli_fetch_assoc($result);
+
+if ($row) {
+    $number = $row["id"] + 1;
+}
+else {
+    $number = 1;
+}
+
+$tag = "LP-" . str_pad($number, 3, "0", STR_PAD_LEFT);
 
 if (isset($_POST["submit"])) {
 
-    $asset_tag = $_POST["asset_tag"];
-    $lab_number = $_POST["lab_number"];
-    $brand_model = $_POST["brand_model"];
-    $purchase_date = $_POST["purchase_date"];
-    $status = $_POST["status"];
-
-    // Laptop Hardware
-    $processor = $_POST["processor"];
-    $ram = $_POST["ram"];
-    $gpu = $_POST["gpu"];
-    $storage = $_POST["storage"];
-    $display = $_POST["display"];
-    $battery = $_POST["battery"];
+    $department = $_POST["department"];
+    $lab = $_POST["lab"];
+    $brand = $_POST["brand"];
+    $model = $_POST["model"];
+    $series = $_POST["series"];
+    $ram = $_POST["ram"]." "."GB";
+    $capacity = $_POST["capacity"];
+    $serial_no = $_POST["serial_no"];
+    $bus_speed = $_POST["bus_speed"];
     $wifi = $_POST["wifi"];
-    $webcam = $_POST["webcam"];
-    $bluetooth = $_POST["bluetooth"];
-    $operating_system = $_POST["operating_system"];
-    $charger = $_POST["charger"];
+    $camera = $_POST["camera"];
+    $processor = $_POST["processor"];
+    $processor_manufacturer = $_POST["processor_manufacturer"];
+    $micro_card = $_POST["micro_card"];
+    $clock_speed = $_POST["clock_speed"];
+    $processor_series = $_POST["processor_series"];
+    $status = $_POST["status"];
+    $motherboard_manufacturer = $_POST["motherboard_manufacturer"];
+    $motherboard_model = $_POST["motherboard_model"];
+    $motherboard_series = $_POST["motherboard_series"];
+    $storage_manufacturer = $_POST["storage_manufacturer"];
+    $storage_type = $_POST["storage_type"];
+    $form_factor = $_POST["form_factor"];
+    $storage_model = $_POST["storage_model"];
 
-    $added_by = $_SESSION["user_id"];
-    $added_username = $_SESSION["fullname"];
-    $filename=$_FILES['file']['name'];
-    $tempname=$_FILES['file']['tmp_name'];
-    $folder="files/".$filename;
-    move_uploaded_file($tempname,$folder);
-    $query = "INSERT INTO `laptop`
-    (
-        `asset_tag`,
-        `lab_number`,
-        `brand_model`,
-        `purchase_date`,
-        `status`,
-        `processor`,
-        `ram`,
-        `gpu`,
-        `storage`,
-        `display`,
-        `battery`,
-        `wifi`,
-        `webcam`,
-        `bluetooth`,
-        `operating_system`,
-        `charger`,
-        `user_id`,
-        `user_name`,
-        `file`
-    )
+    $photo = $_FILES["photo"]["name"];
+
+    if ($photo != "") {
+        move_uploaded_file($_FILES["photo"]["tmp_name"], "files/" . $photo);
+    }
+
+    $sql = "INSERT INTO laptop
+    (asset_tag, department, lab, brand, model, series, ram, capacity, serial_no,
+    bus_speed, wifi, camera, processor, processor_manufacturer, 
+    micro_card, clock_speed, processor_series, status, motherboard_manufacturer,
+    motherboard_model, motherboard_series, storage_manufacturer, storage_type,
+    form_factor, storage_model, photo)
     VALUES
-    (
-        '$asset_tag',
-        '$lab_number',
-        '$brand_model',
-        '$purchase_date',
-        '$status',
-        '$processor',
-        '$ram',
-        '$gpu',
-        '$storage',
-        '$display',
-        '$battery',
-        '$wifi',
-        '$webcam',
-        '$bluetooth',
-        '$operating_system',
-        '$charger',
-        '$added_by',
-        '$added_username',
-        '$filename'
-    )";
+    ('$tag', '$department', '$lab', '$brand', '$model', '$series', '$ram', '$capacity', '$serial_no',
+    '$bus_speed', '$wifi', '$camera', '$processor', '$processor_manufacturer', 
+    '$micro_card', '$clock_speed', '$processor_series', '$status', '$motherboard_manufacturer',
+    '$motherboard_model', '$motherboard_series', '$storage_manufacturer', '$storage_type',
+    '$form_factor', '$storage_model', '$photo')";
 
-    $run = mysqli_query($conn, $query);
-
-    if ($run) {
-        $success = true;
-        $message = "Laptop " . htmlspecialchars($asset_tag) . " was added successfully.";
-    } else {
-        $message = "Could not save this laptop. Check the fields and try again.";
+    if (mysqli_query($conn, $sql)) {
+        $message = "Laptop $tag added successfully.";
+        $result = mysqli_query($conn, "SELECT id FROM laptop ORDER BY id DESC LIMIT 1");
+        $row = mysqli_fetch_assoc($result);
+        $tag = "LP-" . str_pad($row["id"] + 1, 3, "0", STR_PAD_LEFT);
+    }
+    else {
+        $message = "Laptop could not be added.";
     }
 }
 
-$active = "add_asset";
+$active = "add_laptop";
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link href="css/bootstrap.min.css" media="all" rel="stylesheet">
-    <script src="js/bootstrap.min.js"></script>
-    <link href="css/style.css" rel="stylesheet">
-
-    <title>Insert Laptop - ITAMS</title>
+    <title>Add Laptop - ITAMS</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
 <div class="app-shell">
@@ -119,180 +96,220 @@ $active = "add_asset";
     <main class="main">
 
         <div class="topbar">
-
             <div>
-                <div class="eyebrow">Manage / Insert Asset</div>
-                <h1>Add New Laptop</h1>
+                <div class="eyebrow">Add Items</div>
+                <h1>Add Laptop</h1>
             </div>
 
-            <a href="view_laptops.php" class="btn-ghost">
-                View all laptops →
-            </a>
-
+            <a href="view_laptop.php" class="btn-ghost">View Laptop</a>
         </div>
 
-
-        <?php if ($message) { ?>
-
-            <div class="panel"
-                style="padding:14px 20px; margin-bottom:18px;
-                <?php echo $success
-                    ? 'border-color:#bbf7d0; background:#f0fdf4;'
-                    : 'border-color:#fecaca; background:#fef2f2;'; ?>">
-
-                <p style="margin:0;
-                    <?php echo $success
-                        ? 'color:#15803d; font-weight:600;'
-                        : 'color:#dc2626; font-weight:600;'; ?>">
-
-                    <?php echo $message; ?>
-
-                </p>
-
-            </div>
-
+        <?php if ($message != "") { ?>
+            <div class="message"><?php echo $message; ?></div>
         <?php } ?>
 
-
-        <div class="panel" style="max-width:720px;">
+        <div class="panel">
 
             <form method="POST" enctype="multipart/form-data">
 
-                <!-- Identification -->
+                <h2>Identification</h2>
 
-                <h2 style="font-size:15px; text-transform:uppercase;
-                    letter-spacing:.05em; color:#6b7280;
-                    margin-bottom:0;">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Registration No</label>
+                        <input type="text" name="asset_tag" value="<?php echo $tag; ?>" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Department</label>
+                        <select name="department" id="department" required>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Electrical Eng">Electrical Engineering</option>
+                        </select>
+                    </div>
 
-                    Identification
+                    <div class="field">
+                        <label>Lab</label>
+                        <select name="lab" id="lab" required></select>
+                    </div>
+                    <div class="field">
+                        <label>Brand</label>
+                        <select name="brand">
+                            <option value="Unbranded">Unbranded</option>
+                            <option value="HP">HP</option>
+                            <option value="Dell">Dell</option>
+                            <option value="Lenovo">Lenovo</option>
+                            <option value="Acer">Acer</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
 
-                </h2>
+                    <div class="field">
+                        <label>Model</label>
+                        <input type="text" name="model">
+                    </div>
+                    <div class="field">
+                        <label>Series</label>
+                        <input type="text" name="series">
+                    </div>
 
-                <label>Asset Tag (unique)</label>
-                <input type="text" name="asset_tag" required>
+                    <div class="field">
+                        <label>RAM</label>
+                        <select name="ram">
+                            <option value="2 ">2 </option>
+                            <option value="4 ">4 </option>
+                            <option value="8 ">8 </option>
+                            <option value="16 ">16 </option>
+                            <option value="32 ">32 </option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Capacity</label>
+                        <input type="number" name="capacity">
+                    </div>
 
+                    <div class="field">
+                        <label>Serial No</label>
+                        <input type="text" name="serial_no">
+                    </div>
+                    <div class="field">
+                        <label>Bus Speed</label>
+                        <input type="text" name="bus_speed">
+                    </div>
 
-                <label>Lab Number</label>
+                    <div class="field">
+                        <label>WiFi</label>
+                        <select name="wifi">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Camera</label>
+                        <select name="camera">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
 
-                <select name="lab_number" required>
+                <h2>Processor</h2>
 
-                    <option value="1">Lab 1</option>
-                    <option value="2">Lab 2</option>
-                    <option value="3">Lab 3</option>
-                    <option value="4">Lab 4</option>
-                    <option value="5">Lab 5</option>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Processor</label>
+                        <select name="processor">
+                            <option value="Core i3">Core i3</option>
+                            <option value="Core i5">Core i5</option>
+                            <option value="Core i7">Core i7</option>
+                            <option value="Core i9">Core i9</option>
+                            <option value="Ryzen 3">Ryzen 3</option>
+                            <option value="Ryzen 5">Ryzen 5</option>
+                            <option value="Ryzen 7">Ryzen 7</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Manufacturer</label>
+                        <select name="processor_manufacturer">
+                            <option value="Intel">Intel</option>
+                            <option value="AMD">AMD</option>
+                        </select>
+                    </div>
 
-                </select>
+                    <!-- <div class="field">
+                        <label>Processor Type</label>
+                        <select name="processor_type">
+                            <option value="Mobile">Mobile</option>
+                            <option value="Desktop">Desktop</option>
+                        </select>
+                    </div> -->
+                    <div class="field">
+                        <label>Micro Card</label>
+                        <input type="text" name="micro_card">
+                    </div>
 
+                    <div class="field">
+                        <label>Clock Speed</label>
+                        <input type="text" name="clock_speed">
+                    </div>
+                    <div class="field">
+                        <label>Series</label>
+                        <input type="text" name="processor_series">
+                    </div>
 
-                <label>Brand / Model</label>
-                <input type="text" name="brand_model">
+                    <div class="field">
+                        <label>Status</label>
+                        <select name="status">
+                            <!-- <option value="Serviceable">Serviceable</option> -->
+                            <option value="Unserviceable">Unserviceable</option>
+                        </select>
+                    </div>
+                </div>
 
+                <h2>Motherboard Information</h2>
 
-                <label>Purchase Date</label>
-                <input type="date" name="purchase_date">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Manufacturer</label>
+                        <select name="motherboard_manufacturer">
+                            <option value="Dell">Dell</option>
+                            <option value="HP">HP</option>
+                            <option value="Lenovo">Lenovo</option>
+                            <option value="ASUS">ASUS</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Model</label>
+                        <input type="text" name="motherboard_model">
+                    </div>
 
+                    <div class="field">
+                        <label>Series</label>
+                        <input type="text" name="motherboard_series">
+                    </div>
+                </div>
 
-                <label>Status</label>
+                <h2>Storage Media</h2>
 
-                <select name="status">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Manufacturer</label>
+                        <select name="storage_manufacturer">
+                            <option value="Seagate">Seagate</option>
+                            <option value="Western Digital">Western Digital</option>
+                            <option value="Samsung">Samsung</option>
+                            <option value="Kingston">Kingston</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Type</label>
+                        <input type="text" name="storage_type">
+                    </div>
 
-                    <option value="Working">Working</option>
-                    <option value="Faulty">Faulty</option>
-                    <option value="In Repair">In Repair</option>
-                    <option value="Lost">Lost</option>
+                    <div class="field">
+                        <label>Form Factor</label>
+                        <select name="form_factor">
+                            <option value="2.5 inch">2.5 inch</option>
+                            <option value="3.5 inch">3.5 inch</option>
+                            <option value="M.2">M.2</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Model</label>
+                        <input type="text" name="storage_model">
+                    </div>
+                </div>
 
-                </select>
+                <br>
 
+                <button type="submit" name="submit" class="btn-main">Add Laptop</button>
 
-                <!-- Laptop Hardware -->
+                <div class="field" style="margin-top:20px;">
+                    <label>Upload Photo</label>
+                    <input type="file" name="photo">
+                </div>
 
-                <h2 style="font-size:15px; text-transform:uppercase;
-                    letter-spacing:.05em; color:#6b7280;
-                    margin-top:26px; margin-bottom:0;">
-
-                    Laptop Hardware
-
-                </h2>
-
-
-                <label>Processor / CPU</label>
-                <input type="text" name="processor"
-                    placeholder="e.g. Intel Core i5 12th Gen">
-
-
-                <label>RAM</label>
-                <input type="text" name="ram"
-                    placeholder="e.g. 8GB DDR4">
-
-
-                <label>Graphic Card / GPU</label>
-                <input type="text" name="gpu"
-                    placeholder="e.g. NVIDIA MX450 / Integrated">
-
-
-                <label>Storage</label>
-                <input type="text" name="storage"
-                    placeholder="e.g. 512GB SSD">
-
-
-                <label>Display / Screen</label>
-                <input type="text" name="display"
-                    placeholder="e.g. 15.6 inch Full HD">
-
-
-                <label>Battery</label>
-                <input type="text" name="battery"
-                    placeholder="e.g. 45Wh">
-
-
-                <label>Wi-Fi</label>
-                <input type="text" name="wifi"
-                    placeholder="e.g. Wi-Fi 6">
-
-
-                <label>Webcam</label>
-                <input type="text" name="webcam"
-                    placeholder="e.g. HD 720p">
-
-
-                <label>Bluetooth</label>
-                <input type="text" name="bluetooth"
-                    placeholder="e.g. Bluetooth 5.2">
-
-
-                <label>Operating System</label>
-
-                <select name="operating_system">
-
-                    <option value="Windows 11">Windows 11</option>
-                    <option value="Windows 10">Windows 10</option>
-                    <option value="Ubuntu">Ubuntu</option>
-                    <option value="Other">Other</option>
-
-                </select>
-
-
-                <label>Charger / Adapter</label>
-                <input type="text" name="charger"
-                    placeholder="e.g. 65W Original Adapter">
-
-                <label>file upload</label>
-                 <input type="file" name="file" class="form-control" style="width:300px" required>
-                
-               
-
-                <!-- Submit -->
-
-                <button type="submit"
-                    name="submit"
-                    class="btn-main"
-                    style="margin-top:24px;">
-
-                    Save Laptop
-
-                </button>
-                
             </form>
 
         </div>
@@ -300,6 +317,31 @@ $active = "add_asset";
     </main>
 
 </div>
+
+<script>
+function updateLabOptions(preselect) {
+    var dept = document.getElementById('department').value;
+    var labSelect = document.getElementById('lab');
+    var max = (dept === 'Electrical Eng') ? 2 : 6;
+
+    labSelect.innerHTML = '';
+    for (var i = 1; i <= max; i++) {
+        var opt = document.createElement('option');
+        opt.value = 'Lab ' + i;
+        opt.textContent = 'Lab ' + i;
+        labSelect.appendChild(opt);
+    }
+    if (preselect) {
+        labSelect.value = preselect;
+    }
+}
+
+document.getElementById('department').addEventListener('change', function () {
+    updateLabOptions();
+});
+
+updateLabOptions();
+</script>
 
 </body>
 </html>

@@ -1,98 +1,157 @@
 <?php
 include "connection.php";
 session_start();
+
 if (!isset($_SESSION["user_id"])) {
     header("location: login.php");
     exit();
 }
 
-$filter = isset($_GET["lab"]) ? $_GET["lab"] : "all";
+$where = "";
+$filter_department = isset($_GET['department']) ? $_GET['department'] : "";
+$filter_lab = isset($_GET['lab']) ? $_GET['lab'] : "";
 
-if ($filter === "all") {
-    $result = mysqli_query($conn, "SELECT * FROM printer ORDER BY lab_number, asset_tag");
-} else {
-    $result = mysqli_query($conn, "SELECT * FROM printer WHERE lab_number = $filter ORDER BY asset_tag");
-   
+if ($filter_department != "") {
+    $department_escaped = mysqli_real_escape_string($conn, $filter_department);
+    $where = " WHERE department='$department_escaped'";
+
+    if ($filter_lab != "") {
+        $lab_escaped = mysqli_real_escape_string($conn, $filter_lab);
+        $where .= " AND lab='$lab_escaped'";
+    }
 }
 
-function status_pill($status) {
-    $class = "status-working";
-    if ($status === "Faulty") $class = "status-faulty";
-    if ($status === "In Repair") $class = "status-repair";
-    return '<span class="status-pill ' . $class . '">' . htmlspecialchars($status) . '</span>';
-}
-
+$result = mysqli_query($conn, "SELECT * FROM printer" . $where . " ORDER BY id DESC");
 $active = "printer";
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/bootstrap.min.css" media="all" rel="stylesheet">
-    <script src="js/bootstrap.min.js"></script>
-    <link href="css/style.css" rel="stylesheet">
-    <title>Printer Specifications - ITAMS</title>
+    <title>View Printer - ITAMS</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
 <div class="app-shell">
+
     <?php include "includes/sidebar.php"; ?>
 
     <main class="main">
+
         <div class="topbar">
             <div>
-                <div class="eyebrow">Category / printer</div>
-                <h1>printer Specifications</h1>
+                <div class="eyebrow">View Items</div>
+                <h1>Printer</h1>
             </div>
-            <a href="printer.php" class="btn-main">+ Add Asset</a>
+            <a href="printer.php" class="btn-main">Add Printer</a>
         </div>
 
         <div class="panel">
-            <div class="panel-header">
-                <form method="GET" style="display:flex; align-items:center; gap:10px;">
-                    <label style="margin:0;">Filter by Lab</label>
-                    <select name="lab" onchange="this.form.submit()" style="width:auto;">
-                        <option value="all" <?php if ($filter === "all") echo "selected"; ?>>All Labs</option>
-                        <?php for ($i = 1; $i <= 5; $i++) { ?>
-                            <option value="<?php echo $i; ?>" <?php if ($filter == $i) echo "selected"; ?>>Lab <?php echo $i; ?></option>
-                        <?php } ?>
+            <form method="GET" class="filter-form">
+                <div class="field">
+                    <label>Department</label>
+                    <select name="department" id="department">
+                        <option value="">All Departments</option>
+                        <option value="Computer Science" <?php echo ($filter_department == 'Computer Science') ? 'selected' : ''; ?>>Computer Science</option>
+                        <option value="Electrical Eng" <?php echo ($filter_department == 'Electrical Eng') ? 'selected' : ''; ?>>Electrical Engineering</option>
                     </select>
-                </form>
-            </div>
+                </div>
+                <div class="field">
+                    <label>Lab</label>
+                    <select name="lab" id="lab"></select>
+                </div>
+                <button type="submit" class="btn-main">View</button>
+            </form>
+        </div>
 
-            <?php if ($result && mysqli_num_rows($result) > 0) { ?>
+        <div class="panel">
+
+            <?php if (mysqli_num_rows($result) > 0) { ?>
+
                 <table>
                     <tr>
-                        <th>Tag</th><th>Lab</th><th>Brand/Model</th><th>Status</th>
-                        <th>Printer_type</th><th>connectivity</th><th>paper_size</th><th>User_id</th>User_name<th>
-                            <th>Update</th>
+                        <th>Registration No</th>
+                        <th>Department</th>
+                        <th>Brand</th>
+                        <th>Printer Class</th>
+                        <th>Model</th>
+                        <th>Serial No</th>
+                        <th>Printer Type</th>
+                        <th>Color Printer</th>
+                        <th>Toner</th>
+                        <th>Status</th>
+                        <th>Update Status</th>
                     </tr>
+
                     <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                         <tr>
                             <td><?php echo htmlspecialchars($row["asset_tag"]); ?></td>
-                            <td>Lab <?php echo htmlspecialchars($row["lab_number"]); ?></td>
-                            <td><?php echo htmlspecialchars($row["brand_model"]); ?></td>
-                            <td><?php echo status_pill($row["status"]); ?></td>
+                            <td><?php echo htmlspecialchars($row["department"]); ?></td>
+                            <td><?php echo htmlspecialchars($row["brand"]); ?></td>
+                            <td><?php echo htmlspecialchars($row["printer_class"]); ?></td>
+                            <td><?php echo htmlspecialchars($row["model"]); ?></td>
+                            <td><?php echo htmlspecialchars($row["serial_no"]); ?></td>
                             <td><?php echo htmlspecialchars($row["printer_type"]); ?></td>
-                            <td><?php echo htmlspecialchars($row["connectivity"]); ?></td>
-                            <td><?php echo htmlspecialchars($row["paper_size"]); ?></td>
-                            <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
-                            <td><?php echo htmlspecialchars($row["user_name"]); ?></td>
-                            <td><a href="Update_printer.php?id=<?php echo $row["id"]; ?>"><button>Update</button></a></td>
+                            <td><?php echo htmlspecialchars($row["color_printer"]); ?></td>
+                            <td><?php echo htmlspecialchars($row["toner"]); ?></td>
+                            <td>
+                                <span class="status-pill <?php echo $row["status"] == "Serviceable" ? "status-serviceable" : "status-unserviceable"; ?>">
+                                    <?php echo htmlspecialchars($row["status"]); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <a href="update_status.php?type=printer&id=<?php echo $row["id"]; ?>">Update</a>
+                            </td>
                         </tr>
                     <?php } ?>
+
                 </table>
+
             <?php } else { ?>
-                <div class="empty-state">
-                    <div class="cat-icon-wrap" style="display:flex; margin-left:auto; margin-right:auto;">
-                        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="1.5" stroke="currentColor" stroke-width="2"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    </div>
-                    <p>No printer recorded <?php echo $filter !== 'all' ? 'for Lab ' . htmlspecialchars($filter) : 'yet'; ?>.</p>
-                    <a href="printer.php" class="btn-main">+ Add the first one</a>
-                </div>
+                <div class="empty-state">No printer added yet.</div>
             <?php } ?>
+
         </div>
+
     </main>
+
 </div>
+
+<script>
+function updateLabOptions(preselect) {
+    var dept = document.getElementById('department').value;
+    var labSelect = document.getElementById('lab');
+
+    labSelect.innerHTML = '';
+
+    var allOpt = document.createElement('option');
+    allOpt.value = '';
+    allOpt.textContent = 'All Labs';
+    labSelect.appendChild(allOpt);
+
+    if (dept === '') {
+        return;
+    }
+
+    var max = (dept === 'Electrical Eng') ? 2 : 6;
+    for (var i = 1; i <= max; i++) {
+        var opt = document.createElement('option');
+        opt.value = 'Lab ' + i;
+        opt.textContent = 'Lab ' + i;
+        labSelect.appendChild(opt);
+    }
+    if (preselect) {
+        labSelect.value = preselect;
+    }
+}
+
+document.getElementById('department').addEventListener('change', function () {
+    updateLabOptions();
+});
+
+updateLabOptions(<?php echo json_encode($filter_lab); ?>);
+</script>
+
 </body>
 </html>

@@ -8,119 +8,65 @@ if (!isset($_SESSION["user_id"])) {
 }
 
 $message = "";
-$success = false;
+
+$result = mysqli_query($conn, "SELECT id FROM printer ORDER BY id DESC LIMIT 1");
+$row = mysqli_fetch_assoc($result);
+
+if ($row) {
+    $number = $row["id"] + 1;
+}
+else {
+    $number = 1;
+}
+
+$tag = "PR-" . str_pad($number, 3, "0", STR_PAD_LEFT);
 
 if (isset($_POST["submit"])) {
 
-    $asset_tag = $_POST["asset_tag"];
-    $lab_number = $_POST["lab_number"];
-    $brand_model = $_POST["brand_model"];
-    $purchase_date = $_POST["purchase_date"];
+    $department = $_POST["department"];
+    $lab = $_POST["lab"];
+    $brand = $_POST["brand"];
+    $printer_class = $_POST["printer_class"];
+    $model = $_POST["model"];
+    $serial_no = $_POST["serial_no"];
+    $printer_type = $_POST["printer_type"];
+    $color_printer = $_POST["color_printer"];
+    $toner = $_POST["toner"];
     $status = $_POST["status"];
 
-    // Printer Hardware / Specifications
-    $printer_type = $_POST["printer_type"];
-    $printing_technology = $_POST["printing_technology"];
-    $connectivity = $_POST["connectivity"];
-    $paper_size = $_POST["paper_size"];
-    $print_speed = $_POST["print_speed"];
-    $resolution = $_POST["resolution"];
-    $duplex_printing = $_POST["duplex_printing"];
-    $color_printing = $_POST["color_printing"];
-    $scanner = $_POST["scanner"];
-    $copy_function = $_POST["copy_function"];
-    $network_support = $_POST["network_support"];
-    $toner_ink = $_POST["toner_ink"];
-    $added_by = $_SESSION["user_id"];
-    $added_username = $_SESSION["fullname"];
-    $filename=$_FILES['file']['name'];
-    $tempname=$_FILES['file']['tmp_name'];
-    $folder="files/".$filename;
-    move_uploaded_file($tempname,$folder);
+    $photo = $_FILES["photo"]["name"];
 
-    $query = "INSERT INTO `printer`
-    (
-        `asset_tag`,
-        `lab_number`,
-        `brand_model`,
-        `purchase_date`,
-        `status`,
-        `printer_type`,
-        `printing_technology`,
-        `connectivity`,
-        `paper_size`,
-        `print_speed`,
-        `resolution`,
-        `duplex_printing`,
-        `color_printing`,
-        `scanner`,
-        `copy_function`,
-        `network_support`,
-        `toner_ink`,
-        `user_id`,
-        `user_name`,
-        `file`
-    )
+    if ($photo != "") {
+        move_uploaded_file($_FILES["photo"]["tmp_name"], "files/" . $photo);
+    }
+
+    $sql = "INSERT INTO printer
+    (asset_tag, department, lab, brand, printer_class, model, serial_no,
+    printer_type, color_printer, toner, status, photo)
     VALUES
-    (
-        '$asset_tag',
-        '$lab_number',
-        '$brand_model',
-        '$purchase_date',
-        '$status',
-        '$printer_type',
-        '$printing_technology',
-        '$connectivity',
-        '$paper_size',
-        '$print_speed',
-        '$resolution',
-        '$duplex_printing',
-        '$color_printing',
-        '$scanner',
-        '$copy_function',
-        '$network_support',
-        '$toner_ink',
-        '$added_by',
-        '$added_username',
-        '$filename'
-    )";
+    ('$tag', '$department', '$lab', '$brand', '$printer_class', '$model', '$serial_no',
+    '$printer_type', '$color_printer', '$toner', '$status', '$photo')";
 
-    $run = mysqli_query($conn, $query);
-
-    if ($run) {
-        $success = true;
-        $message = "Printer " . htmlspecialchars($asset_tag) . " was added successfully.";
-    } else {
-        $message = "Could not save this printer. Check the fields and try again.";
+    if (mysqli_query($conn, $sql)) {
+        $message = "Printer $tag added successfully.";
+        $result = mysqli_query($conn, "SELECT id FROM printer ORDER BY id DESC LIMIT 1");
+        $row = mysqli_fetch_assoc($result);
+        $tag = "PR-" . str_pad($row["id"] + 1, 3, "0", STR_PAD_LEFT);
+    }
+    else {
+        $message = "Printer could not be added.";
     }
 }
 
-$active = "add_asset";
+$active = "add_printer";
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <link href="css/bootstrap.min.css"
-          media="all"
-          rel="stylesheet">
-
-    <script src="js/bootstrap.min.js"></script>
-
-    <link href="css/style.css"
-          rel="stylesheet">
-
-    <title>Insert Printer - ITAMS</title>
-
+    <title>Add Printer - ITAMS</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
 <div class="app-shell">
@@ -130,328 +76,106 @@ $active = "add_asset";
     <main class="main">
 
         <div class="topbar">
-
             <div>
-
-                <div class="eyebrow">
-                    Manage / Insert Asset
-                </div>
-
-                <h1>Add New Printer</h1>
-
+                <div class="eyebrow">Add Items</div>
+                <h1>Add Printer</h1>
             </div>
 
-            <a href="view_printers.php"
-               class="btn-ghost">
-
-                View all printers →
-
-            </a>
-
+            <a href="view_printer.php" class="btn-ghost">View Printer</a>
         </div>
 
-
-        <?php if ($message) { ?>
-
-            <div class="panel"
-                 style="padding:14px 20px;
-                 margin-bottom:18px;
-                 <?php echo $success
-                 ? 'border-color:#bbf7d0; background:#f0fdf4;'
-                 : 'border-color:#fecaca; background:#fef2f2;'; ?>">
-
-                <p style="margin:0;
-                <?php echo $success
-                ? 'color:#15803d; font-weight:600;'
-                : 'color:#dc2626; font-weight:600;'; ?>">
-
-                    <?php echo $message; ?>
-
-                </p>
-
-            </div>
-
+        <?php if ($message != "") { ?>
+            <div class="message"><?php echo $message; ?></div>
         <?php } ?>
 
-
-        <div class="panel"
-             style="max-width:720px;">
+        <div class="panel">
 
             <form method="POST" enctype="multipart/form-data">
 
-                <!-- Identification -->
-
-                <h2 style="font-size:15px;
-                text-transform:uppercase;
-                letter-spacing:.05em;
-                color:#6b7280;
-                margin-bottom:0;">
-
-                    Identification
-
-                </h2>
-
-
-                <label>Asset Tag (unique)</label>
-
-                <input type="text"
-                       name="asset_tag"
-                       required>
-
-
-                <label>Lab Number</label>
-
-                <select name="lab_number"
-                        required>
-
-                    <option value="1">Lab 1</option>
-                    <option value="2">Lab 2</option>
-                    <option value="3">Lab 3</option>
-                    <option value="4">Lab 4</option>
-                    <option value="5">Lab 5</option>
-
-                </select>
-
-
-                <label>Brand / Model</label>
-
-                <input type="text"
-                       name="brand_model"
-                       placeholder="e.g. HP LaserJet Pro M404">
-
-
-                <label>Purchase Date</label>
-
-                <input type="date"
-                       name="purchase_date">
-
-
-                <label>Status</label>
-
-                <select name="status">
-
-                    <option value="Working">
-                        Working
-                    </option>
-
-                    <option value="Faulty">
-                        Faulty
-                    </option>
-
-                    <option value="In Repair">
-                        In Repair
-                    </option>
-
-                    <option value="Lost">
-                        Lost
-                    </option>
-
-                </select>
-
-
-                <!-- Printer Specifications -->
-
-                <h2 style="font-size:15px;
-                text-transform:uppercase;
-                letter-spacing:.05em;
-                color:#6b7280;
-                margin-top:26px;
-                margin-bottom:0;">
-
-                    Printer Specifications
-
-                </h2>
-
-
-                <label>Printer Type</label>
-
-                <select name="printer_type">
-
-                    <option value="Laser">
-                        Laser Printer
-                    </option>
-
-                    <option value="Inkjet">
-                        Inkjet Printer
-                    </option>
-
-                    <option value="Dot Matrix">
-                        Dot Matrix Printer
-                    </option>
-
-                    <option value="Thermal">
-                        Thermal Printer
-                    </option>
-
-                    <option value="Multifunction">
-                        Multifunction Printer
-                    </option>
-
-                </select>
-
-
-                <label>Printing Technology</label>
-
-                <select name="printing_technology">
-
-                    <option value="Laser">
-                        Laser
-                    </option>
-
-                    <option value="Inkjet">
-                        Inkjet
-                    </option>
-
-                    <option value="Dot Matrix">
-                        Dot Matrix
-                    </option>
-
-                    <option value="Thermal">
-                        Thermal
-                    </option>
-
-                </select>
-
-
-                <label>Connectivity</label>
-
-                <select name="connectivity">
-
-                    <option value="USB">
-                        USB
-                    </option>
-
-                    <option value="Wi-Fi">
-                        Wi-Fi
-                    </option>
-
-                    <option value="Ethernet">
-                        Ethernet
-                    </option>
-
-                    <option value="USB + Wi-Fi">
-                        USB + Wi-Fi
-                    </option>
-
-                    <option value="USB + Ethernet">
-                        USB + Ethernet
-                    </option>
-
-                </select>
-
-
-                <label>Paper Size</label>
-
-                <select name="paper_size">
-
-                    <option value="A4">A4</option>
-                    <option value="A3">A3</option>
-                    <option value="A5">A5</option>
-                    <option value="Letter">Letter</option>
-                    <option value="Legal">Legal</option>
-
-                </select>
-
-
-                <label>Print Speed</label>
-
-                <input type="text"
-                       name="print_speed"
-                       placeholder="e.g. 30 pages per minute">
-
-
-                <label>Print Resolution</label>
-
-                <input type="text"
-                       name="resolution"
-                       placeholder="e.g. 1200 x 1200 DPI">
-
-
-                <label>Duplex Printing</label>
-
-                <select name="duplex_printing">
-
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-
-                </select>
-
-
-                <label>Color Printing</label>
-
-                <select name="color_printing">
-
-                    <option value="Color">Color</option>
-                    <option value="Black & White">
-                        Black & White
-                    </option>
-
-                </select>
-
-
-                <!-- Additional Features -->
-
-                <h2 style="font-size:15px;
-                text-transform:uppercase;
-                letter-spacing:.05em;
-                color:#6b7280;
-                margin-top:26px;
-                margin-bottom:0;">
-
-                    Additional Features
-
-                </h2>
-
-
-                <label>Scanner</label>
-
-                <select name="scanner">
-
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-
-                </select>
-
-
-                <label>Copy Function</label>
-
-                <select name="copy_function">
-
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-
-                </select>
-
-
-                <label>Network Support</label>
-
-                <select name="network_support">
-
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-
-                </select>
-
-
-                <label>Toner / Ink Type</label>
-
-                <input type="text"
-                       name="toner_ink"
-                       placeholder="e.g. HP 76A Toner">
-
-                <label>file upload</label>
-                 <input type="file" name="file" class="form-control" style="width:300px" required>
-                 
-
-
-                <button type="submit"
-                        name="submit"
-                        class="btn-main"
-                        style="margin-top:24px;">
-
-                    Save Printer
-
-                </button>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Registration No</label>
+                        <input type="text" name="asset_tag" value="<?php echo $tag; ?>" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Department</label>
+                        <select name="department" id="department" required>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Electrical Eng">Electrical Engineering</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Lab</label>
+                        <select name="lab" id="lab" required></select>
+                    </div>
+                    <div class="field">
+                        <label>Brand</label>
+                        <select name="brand">
+                            <option value="Unbranded">Unbranded</option>
+                            <option value="HP">HP</option>
+                            <option value="Canon">Canon</option>
+                            <option value="Epson">Epson</option>
+                            <option value="Brother">Brother</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Printer Class</label>
+                        <select name="printer_class">
+                            <option value="Personal">Personal</option>
+                            <option value="Workgroup">Workgroup</option>
+                            <option value="Enterprise">Enterprise</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Model</label>
+                        <input type="text" name="model">
+                    </div>
+                    <div class="field">
+                        <label>Serial No</label>
+                        <input type="text" name="serial_no">
+                    </div>
+
+                    <div class="field">
+                        <label>Printer Type</label>
+                        <select name="printer_type">
+                            <option value="Laser">Laser</option>
+                            <option value="Inkjet">Inkjet</option>
+                            <option value="Dot Matrix">Dot Matrix</option>
+                            <option value="Thermal">Thermal</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Color Printer</label>
+                        <select name="color_printer">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Toner</label>
+                        <input type="text" name="toner">
+                    </div>
+                    <div class="field">
+                        <label>Status</label>
+                        <select name="status">
+                            <!-- <option value="Serviceable">Serviceable</option> -->
+                            <option value="Unserviceable">Unserviceable</option>
+                        </select>
+                    </div>
+                </div>
+
+                <br>
+
+                <button type="submit" name="submit" class="btn-main">Add Printer</button>
+
+                <div class="field" style="margin-top:20px;">
+                    <label>Upload Photo</label>
+                    <input type="file" name="photo">
+                </div>
 
             </form>
 
@@ -461,6 +185,30 @@ $active = "add_asset";
 
 </div>
 
-</body>
+<script>
+function updateLabOptions(preselect) {
+    var dept = document.getElementById('department').value;
+    var labSelect = document.getElementById('lab');
+    var max = (dept === 'Electrical Eng') ? 2 : 6;
 
+    labSelect.innerHTML = '';
+    for (var i = 1; i <= max; i++) {
+        var opt = document.createElement('option');
+        opt.value = 'Lab ' + i;
+        opt.textContent = 'Lab ' + i;
+        labSelect.appendChild(opt);
+    }
+    if (preselect) {
+        labSelect.value = preselect;
+    }
+}
+
+document.getElementById('department').addEventListener('change', function () {
+    updateLabOptions();
+});
+
+updateLabOptions();
+</script>
+
+</body>
 </html>
