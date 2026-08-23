@@ -33,6 +33,14 @@ if (isset($_POST["update"])) {
     $model = mysqli_real_escape_string($conn, $_POST["model"]);
     $status = mysqli_real_escape_string($conn, $_POST["status"]);
 
+    $photo_sql = "";
+    if (!empty($_FILES["photo"]["name"])) {
+        $photo = $_FILES["photo"]["name"];
+        move_uploaded_file($_FILES["photo"]["tmp_name"], "files/" . $photo);
+        $photo = mysqli_real_escape_string($conn, $photo);
+        $photo_sql = ", photo='$photo'";
+    }
+
     if ($type == "desktop" || $type == "laptop") {
 
         $series = mysqli_real_escape_string($conn, $_POST["series"]);
@@ -70,7 +78,7 @@ if (isset($_POST["update"])) {
                 status='$status', motherboard_manufacturer='$motherboard_manufacturer',
                 motherboard_model='$motherboard_model', motherboard_series='$motherboard_series',
                 storage_manufacturer='$storage_manufacturer', storage_type='$storage_type',
-                form_factor='$form_factor', storage_model='$storage_model'
+                form_factor='$form_factor', storage_model='$storage_model' $photo_sql
                 WHERE id='$id'";
 
         } else {
@@ -86,7 +94,7 @@ if (isset($_POST["update"])) {
                 status='$status', motherboard_manufacturer='$motherboard_manufacturer',
                 motherboard_model='$motherboard_model', motherboard_series='$motherboard_series',
                 storage_manufacturer='$storage_manufacturer', storage_type='$storage_type',
-                form_factor='$form_factor', storage_model='$storage_model'
+                form_factor='$form_factor', storage_model='$storage_model' $photo_sql
                 WHERE id='$id'";
         }
 
@@ -102,7 +110,7 @@ if (isset($_POST["update"])) {
             asset_tag='$asset_tag', department='$department', lab='$lab', brand='$brand',
             printer_class='$printer_class', model='$model', serial_no='$serial_no',
             printer_type='$printer_type', color_printer='$color_printer', toner='$toner',
-            status='$status'
+            status='$status' $photo_sql
             WHERE id='$id'";
 
     } else { // projector
@@ -111,7 +119,7 @@ if (isset($_POST["update"])) {
 
         $sql = "UPDATE projector SET
             asset_tag='$asset_tag', department='$department', lab='$lab', brand='$brand', model='$model',
-            connection_type='$connection_type', status='$status'
+            connection_type='$connection_type', status='$status' $photo_sql
             WHERE id='$id'";
     }
 
@@ -159,7 +167,7 @@ $active = "update_status";
                 <div class="message"><?php echo $message; ?></div>
             <?php } ?>
 
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
 
                 <h2>Identification</h2>
 
@@ -472,6 +480,11 @@ $active = "update_status";
                             <option value="Unserviceable" <?php echo sel($array['status'],'Unserviceable'); ?>>Unserviceable</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="field">
+                    <label>Update Photo</label>
+                    <input type="file" name="photo">
                 </div>
 
                 <br>

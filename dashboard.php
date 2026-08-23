@@ -40,18 +40,29 @@ $total_unserviceable =
     get_status_count($conn, "printer", "Unserviceable") +
     get_status_count($conn, "projector", "Unserviceable");
 
-// The "Working" sidebar link points here with ?view=working, which reveals
-// the serviceable-items tables below and highlights the Working nav item.
+// The "Serviceable" / "Unserviceable" sidebar links point here with
+// ?view=working&status=..., which reveals the matching items below
+// and highlights the right nav item.
 $show_working = (isset($_GET['view']) && $_GET['view'] == 'working');
 
-if ($show_working) {
-    $desktop_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM desktop WHERE status='Serviceable'");
-    $laptop_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM laptop WHERE status='Serviceable'");
-    $printer_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM printer WHERE status='Serviceable'");
-    $projector_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM projector WHERE status='Serviceable'");
+$status_param = "Serviceable";
+if (isset($_GET['status']) && $_GET['status'] == "Unserviceable") {
+    $status_param = "Unserviceable";
 }
 
-$active = $show_working ? "working" : "dashboard";
+if ($show_working) {
+    $desktop_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM desktop WHERE status='$status_param'");
+    $laptop_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM laptop WHERE status='$status_param'");
+    $printer_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM printer WHERE status='$status_param'");
+    $projector_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM projector WHERE status='$status_param'");
+}
+
+// numbers for the serviceable / unserviceable chart on the dashboard
+$chart_total = $total_serviceable + $total_unserviceable;
+$service_pct = $chart_total > 0 ? round(($total_serviceable / $chart_total) * 100) : 0;
+$unservice_pct = $chart_total > 0 ? (100 - $service_pct) : 0;
+
+$active = $show_working ? strtolower($status_param) : "dashboard";
 ?>
 
 <!DOCTYPE html>
@@ -121,6 +132,25 @@ $active = $show_working ? "working" : "dashboard";
             </div>
 
         </div>
+        <div class="section-heading">Serviceable vs Unserviceable</div>
+
+        <div class="panel health-panel">
+            <div class="topbar" style="margin-bottom:14px;">
+                <div class="eyebrow">Fleet Health</div>
+                <span class="health-summary"><?php echo $service_pct; ?>% Serviceable</span>
+            </div>
+
+            <div class="health-bar">
+                <div class="health-seg health-seg-ok" style="width: <?php echo $service_pct; ?>%;"></div>
+                <div class="health-seg health-seg-bad" style="width: <?php echo $unservice_pct; ?>%;"></div>
+            </div>
+
+            <div class="health-legend">
+                <span><span class="dot dot-ok"></span> Serviceable — <?php echo $total_serviceable; ?></span>
+                <span><span class="dot dot-bad"></span> Unserviceable — <?php echo $total_unserviceable; ?></span>
+            </div>
+        </div>
+
         <div class="section-heading">Browse by Category</div>
 
         <div class="category-grid">
@@ -154,10 +184,10 @@ $active = $show_working ? "working" : "dashboard";
 
         <?php if ($show_working) { ?>
 
-        <div class="section-heading">Working Items</div>
+        <div class="section-heading"><?php echo htmlspecialchars($status_param); ?> Items</div>
 
         <div class="panel">
-            <h2>Working Desktop</h2>
+            <h2><?php echo htmlspecialchars($status_param); ?> Desktop</h2>
             <table>
                 <tr>
                     <th>Registration No</th>
@@ -177,7 +207,7 @@ $active = $show_working ? "working" : "dashboard";
         </div>
 
         <div class="panel">
-            <h2>Working Laptop</h2>
+            <h2><?php echo htmlspecialchars($status_param); ?> Laptop</h2>
             <table>
                 <tr>
                     <th>Registration No</th>
@@ -197,7 +227,7 @@ $active = $show_working ? "working" : "dashboard";
         </div>
 
         <div class="panel">
-            <h2>Working Printer</h2>
+            <h2><?php echo htmlspecialchars($status_param); ?> Printer</h2>
             <table>
                 <tr>
                     <th>Registration No</th>
@@ -217,7 +247,7 @@ $active = $show_working ? "working" : "dashboard";
         </div>
 
         <div class="panel">
-            <h2>Working Projector</h2>
+            <h2><?php echo htmlspecialchars($status_param); ?> Projector</h2>
             <table>
                 <tr>
                     <th>Registration No</th>
