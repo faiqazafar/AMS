@@ -91,7 +91,7 @@ $active = "laptop";
                             <td><?php echo htmlspecialchars($row["lab"]); ?></td>
                             <td><?php echo htmlspecialchars($row["brand"]); ?></td>
                             <td><?php echo htmlspecialchars($row["model"]); ?></td>
-                            <td><?php echo htmlspecialchars($row["ram"]); ?></td>
+                            <td><?php echo htmlspecialchars($row["ramtype"]); ?></td>
                             <td><?php echo htmlspecialchars($row["capacity"]); ?></td>
                             <td><?php echo htmlspecialchars($row["camera"]); ?></td>
                             <td>
