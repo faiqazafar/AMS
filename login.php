@@ -59,6 +59,7 @@ if (isset($_POST["submit"])) {
         <div class="container">
 
             <h1>IT Management System</h1>
+            <h4>Comsats University Islamabad</h4>
 
             <p>Login to your account</p>
 

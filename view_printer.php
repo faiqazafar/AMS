@@ -8,8 +8,8 @@ if (!isset($_SESSION["user_id"])) {
 }
 
 $where = "";
-$filter_department = isset($_GET['department']) ? $_GET['department'] : "";
-$filter_lab = isset($_GET['lab']) ? $_GET['lab'] : "";
+$filter_department = isset($_POST['department']) ? $_POST['department'] : "";
+$filter_lab = isset($_POST['lab']) ? $_POST['lab'] : "";
 
 if ($filter_department != "") {
     $department_escaped = mysqli_real_escape_string($conn, $filter_department);
@@ -48,7 +48,7 @@ $active = "printer";
         </div>
 
         <div class="panel">
-            <form method="GET" class="filter-form">
+            <form method="POST" class="filter-form">
                 <div class="field">
                     <label>Department</label>
                     <select name="department" id="department">
@@ -73,6 +73,7 @@ $active = "printer";
                     <tr>
                         <th>Registration No</th>
                         <th>Department</th>
+                        <th>Lab</th>
                         <th>Brand</th>
                         <th>Printer Class</th>
                         <th>Model</th>
@@ -88,6 +89,7 @@ $active = "printer";
                         <tr>
                             <td><?php echo htmlspecialchars($row["asset_tag"]); ?></td>
                             <td><?php echo htmlspecialchars($row["department"]); ?></td>
+                            <td><?php echo htmlspecialchars($row["lab"]); ?></td>
                             <td><?php echo htmlspecialchars($row["brand"]); ?></td>
                             <td><?php echo htmlspecialchars($row["printer_class"]); ?></td>
                             <td><?php echo htmlspecialchars($row["model"]); ?></td>
@@ -101,7 +103,10 @@ $active = "printer";
                                 </span>
                             </td>
                             <td>
-                                <a href="update_status.php?type=printer&id=<?php echo $row["id"]; ?>">Update</a>
+                                <form method="POST" action="update_printer.php">
+                                    <input type="hidden" name="id" value="<?php echo $row["id"]; ?>">
+                                    <button type="submit" name="open_update" class="btn-main">Update</button>
+                                </form>
                             </td>
                         </tr>
                     <?php } ?>

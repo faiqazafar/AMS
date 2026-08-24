@@ -28,8 +28,8 @@ if (isset($_POST["submit"])) {
     $brand = $_POST["brand"];
     $model = $_POST["model"];
     $series = $_POST["series"];
-    $ram = $_POST["ram"]." "."GB";
-    $capacity = $_POST["capacity"];
+    $capacity = $_POST["capacity"]." "."GB";
+    $ram = $_POST["ramtype"];
     $serial_no = $_POST["serial_no"];
     $bus_speed = $_POST["bus_speed"];
     $ethernet_card = $_POST["ethernet_card"];
@@ -38,17 +38,16 @@ if (isset($_POST["submit"])) {
     $wifi = $_POST["wifi"];
     $processor = $_POST["processor"];
     $processor_manufacturer = $_POST["processor_manufacturer"];
-    $micro_card = $_POST["micro_card"];
     $clock_speed = $_POST["clock_speed"];
     $processor_series = $_POST["processor_series"];
-    $status = $_POST["status"];
     $motherboard_manufacturer = $_POST["motherboard_manufacturer"];
     $motherboard_model = $_POST["motherboard_model"];
     $motherboard_series = $_POST["motherboard_series"];
     $storage_manufacturer = $_POST["storage_manufacturer"];
     $storage_type = $_POST["storage_type"];
-    $form_factor = $_POST["form_factor"];
+    $Capacity =  $_POST["scapacity"];
     $storage_model = $_POST["storage_model"];
+    $status=$_POST["status"];
 
     $photo = $_FILES["photo"]["name"];
 
@@ -57,19 +56,16 @@ if (isset($_POST["submit"])) {
     }
 
     $sql = "INSERT INTO desktop
-    (asset_tag, department, lab, brand, model, series, ram, capacity, serial_no,
+    (asset_tag, department, lab, brand, model, series, capacity,ramtype, serial_no,
     bus_speed, ethernet_card, ethernet_model, mac_address, wifi, processor,
-    processor_manufacturer, micro_card, clock_speed,
-    processor_series, status, motherboard_manufacturer, motherboard_model,
-    motherboard_series, storage_manufacturer, storage_type, form_factor,
-    storage_model, photo)
+    processor_manufacturer,clock_speed,processor_series, motherboard_manufacturer, motherboard_model,
+    motherboard_series, storage_manufacturer, storage_type, S_capacity,
+    storage_model,status, photo)
     VALUES
-    ('$tag', '$department', '$lab', '$brand', '$model', '$series', '$ram', '$capacity', '$serial_no',
+    ('$tag', '$department', '$lab', '$brand', '$model', '$series', '$capacity','$ram' , '$serial_no',
     '$bus_speed', '$ethernet_card', '$ethernet_model', '$mac_address', '$wifi', '$processor',
-    '$processor_manufacturer', '$micro_card', '$clock_speed',
-    '$processor_series', '$status', '$motherboard_manufacturer', '$motherboard_model',
-    '$motherboard_series', '$storage_manufacturer', '$storage_type', '$form_factor',
-    '$storage_model', '$photo')";
+    '$processor_manufacturer', '$clock_speed','$processor_series','$motherboard_manufacturer', '$motherboard_model',
+    '$motherboard_series', '$storage_manufacturer', '$storage_type', '$Capacity','$storage_model','$status', '$photo')";
 
     if (mysqli_query($conn, $sql)) {
         $message = "Desktop $tag added successfully.";
@@ -157,8 +153,8 @@ $active = "add_desktop";
                     </div>
 
                     <div class="field">
-                        <label>RAM</label>
-                        <select name="ram">
+                        <label>Capacity</label>
+                        <select name="capacity">
                             <option value="2 ">2 </option>
                             <option value="4 ">4 </option>
                             <option value="8 ">8 </option>
@@ -167,8 +163,8 @@ $active = "add_desktop";
                         </select>
                     </div>
                     <div class="field">
-                        <label>Capacity</label>
-                        <input type="number" name="capacity">
+                        <label>RAM Type</label>
+                        <input type="text" name="ramtype">
                     </div>
 
                     <div class="field">
@@ -239,10 +235,10 @@ $active = "add_desktop";
                             <option value="Mobile">Mobile</option>
                         </select>
                     </div> -->
-                    <div class="field">
+                    <!-- <div class="field">
                         <label>Micro Card</label>
                         <input type="text" name="micro_card">
-                    </div>
+                    </div> -->
 
                     <div class="field">
                         <label>Clock Speed</label>
@@ -253,13 +249,13 @@ $active = "add_desktop";
                         <input type="text" name="processor_series">
                     </div>
 
-                    <div class="field">
+                    <!-- <div class="field">
                         <label>Status</label>
                         <select name="status">
-                             <!-- <option value="Serviceable">Serviceable</option>  -->
-                            <option value="Unserviceable">Unserviceable</option> 
+                             <option value="Serviceable">Serviceable</option> 
+                             <option value="Unserviceable">Unserviceable</option> 
                         </select>
-                    </div>
+                    </div> -->
                 </div>
 
                 <h2>Motherboard Information</h2>
@@ -306,18 +302,22 @@ $active = "add_desktop";
                     </div>
 
                     <div class="field">
-                        <label>Form Factor</label>
-                        <select name="form_factor">
-                            <option value="2.5 inch">2.5 inch</option>
-                            <option value="3.5 inch">3.5 inch</option>
-                            <option value="M.2">M.2</option>
-                        </select>
+                        <label>Capacity</label>
+                        <input type="text" name="scapacity">
                     </div>
                     <div class="field">
                         <label>Model</label>
                         <input type="text" name="storage_model">
                     </div>
+                    <div>
+                        <label>status</label>
+                        <select name="status">
+                            <option>seviceable</option>
+                            
+                        </select>
+                    </div>
                 </div>
+
 
                 <br>
 

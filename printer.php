@@ -162,8 +162,8 @@ $active = "add_printer";
                     <div class="field">
                         <label>Status</label>
                         <select name="status">
-                            <!-- <option value="Serviceable">Serviceable</option> -->
-                            <option value="Unserviceable">Unserviceable</option>
+                            <option value="Serviceable">Serviceable</option>
+                            <!-- <option value="Unserviceable">Unserviceable</option> -->
                         </select>
                     </div>
                 </div>

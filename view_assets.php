@@ -8,8 +8,8 @@ if (!isset($_SESSION["user_id"])) {
 }
 
 $where = "";
-$filter_department = isset($_GET['department']) ? $_GET['department'] : "";
-$filter_lab = isset($_GET['lab']) ? $_GET['lab'] : "";
+$filter_department = isset($_POST['department']) ? $_POST['department'] : "";
+$filter_lab = isset($_POST['lab']) ? $_POST['lab'] : "";
 
 if ($filter_department != "") {
     $department_escaped = mysqli_real_escape_string($conn, $filter_department);
@@ -48,7 +48,7 @@ $active = "desktop";
         </div>
 
         <div class="panel">
-            <form method="GET" class="filter-form">
+            <form method="POST" class="filter-form">
                 <div class="field">
                     <label>Department</label>
                     <select name="department" id="department">
@@ -73,10 +73,11 @@ $active = "desktop";
                     <tr>
                         <th>Registration No</th>
                         <th>Department</th>
+                        <th>Lab</th>
                         <th>Brand</th>
                         <th>Model</th>
-                        <th>RAM</th>
                         <th>Capacity</th>
+                        <th>Ram</th>
                         <th>Serial No</th>
                         <th>Status</th>
                         <th>Photo</th>
@@ -88,10 +89,11 @@ $active = "desktop";
                         <tr>
                             <td><?php echo htmlspecialchars($row["asset_tag"]); ?></td>
                             <td><?php echo htmlspecialchars($row["department"]); ?></td>
+                            <td><?php echo htmlspecialchars($row["lab"]); ?></td>
                             <td><?php echo htmlspecialchars($row["brand"]); ?></td>
                             <td><?php echo htmlspecialchars($row["model"]); ?></td>
-                            <td><?php echo htmlspecialchars($row["ram"]); ?></td>
                             <td><?php echo htmlspecialchars($row["capacity"]); ?></td>
+                            <td><?php echo htmlspecialchars($row["ramtype"]); ?></td>
                             <td><?php echo htmlspecialchars($row["serial_no"]); ?></td>
                             <td>
                                 <span class="status-pill <?php echo $row["status"] == "Serviceable" ? "status-serviceable" : "status-unserviceable"; ?>">
@@ -106,7 +108,10 @@ $active = "desktop";
                                 <?php } ?>
                             </td>
                             <td>
-                                <a href="update_status.php?type=desktop&id=<?php echo $row["id"]; ?>">Update</a>
+                                <form method="POST" action="update_desktop.php">
+                                    <input type="hidden" name="id" value="<?php echo $row["id"]; ?>">
+                                    <button type="submit" name="open_update" class="btn-main">Update</button>
+                                </form>
                             </td>
                         </tr>
 

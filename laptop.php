@@ -28,25 +28,24 @@ if (isset($_POST["submit"])) {
     $brand = $_POST["brand"];
     $model = $_POST["model"];
     $series = $_POST["series"];
-    $ram = $_POST["ram"]." "."GB";
-    $capacity = $_POST["capacity"];
+    $capacity = $_POST["capacity"] . " GB";
+    $ram = $_POST["ramtype"];
     $serial_no = $_POST["serial_no"];
     $bus_speed = $_POST["bus_speed"];
     $wifi = $_POST["wifi"];
     $camera = $_POST["camera"];
     $processor = $_POST["processor"];
     $processor_manufacturer = $_POST["processor_manufacturer"];
-    $micro_card = $_POST["micro_card"];
     $clock_speed = $_POST["clock_speed"];
     $processor_series = $_POST["processor_series"];
-    $status = $_POST["status"];
     $motherboard_manufacturer = $_POST["motherboard_manufacturer"];
     $motherboard_model = $_POST["motherboard_model"];
     $motherboard_series = $_POST["motherboard_series"];
     $storage_manufacturer = $_POST["storage_manufacturer"];
     $storage_type = $_POST["storage_type"];
-    $form_factor = $_POST["form_factor"];
+    $storage_capacity = $_POST["scapacity"];
     $storage_model = $_POST["storage_model"];
+    $status = $_POST["status"];
 
     $photo = $_FILES["photo"]["name"];
 
@@ -56,19 +55,18 @@ if (isset($_POST["submit"])) {
 
     $sql = "INSERT INTO laptop
     (asset_tag, department, lab, brand, model, series, ram, capacity, serial_no,
-    bus_speed, wifi, camera, processor, processor_manufacturer, 
-    micro_card, clock_speed, processor_series, status, motherboard_manufacturer,
-    motherboard_model, motherboard_series, storage_manufacturer, storage_type,
-    form_factor, storage_model, photo)
+    bus_speed, wifi, camera, processor, processor_manufacturer, clock_speed,
+    processor_series, motherboard_manufacturer, motherboard_model, motherboard_series,
+    storage_manufacturer, storage_type, S_capacity, storage_model, status, photo)
     VALUES
     ('$tag', '$department', '$lab', '$brand', '$model', '$series', '$ram', '$capacity', '$serial_no',
-    '$bus_speed', '$wifi', '$camera', '$processor', '$processor_manufacturer', 
-    '$micro_card', '$clock_speed', '$processor_series', '$status', '$motherboard_manufacturer',
-    '$motherboard_model', '$motherboard_series', '$storage_manufacturer', '$storage_type',
-    '$form_factor', '$storage_model', '$photo')";
+    '$bus_speed', '$wifi', '$camera', '$processor', '$processor_manufacturer', '$clock_speed',
+    '$processor_series', '$motherboard_manufacturer', '$motherboard_model', '$motherboard_series',
+    '$storage_manufacturer', '$storage_type', '$storage_capacity', '$storage_model', '$status', '$photo')";
 
     if (mysqli_query($conn, $sql)) {
         $message = "Laptop $tag added successfully.";
+
         $result = mysqli_query($conn, "SELECT id FROM laptop ORDER BY id DESC LIMIT 1");
         $row = mysqli_fetch_assoc($result);
         $tag = "LP-" . str_pad($row["id"] + 1, 3, "0", STR_PAD_LEFT);
@@ -119,6 +117,7 @@ $active = "add_laptop";
                         <label>Registration No</label>
                         <input type="text" name="asset_tag" value="<?php echo $tag; ?>" readonly>
                     </div>
+
                     <div class="field">
                         <label>Department</label>
                         <select name="department" id="department" required>
@@ -131,6 +130,7 @@ $active = "add_laptop";
                         <label>Lab</label>
                         <select name="lab" id="lab" required></select>
                     </div>
+
                     <div class="field">
                         <label>Brand</label>
                         <select name="brand">
@@ -147,30 +147,33 @@ $active = "add_laptop";
                         <label>Model</label>
                         <input type="text" name="model">
                     </div>
+
                     <div class="field">
                         <label>Series</label>
                         <input type="text" name="series">
                     </div>
 
                     <div class="field">
-                        <label>RAM</label>
-                        <select name="ram">
-                            <option value="2 ">2 </option>
-                            <option value="4 ">4 </option>
-                            <option value="8 ">8 </option>
-                            <option value="16 ">16 </option>
-                            <option value="32 ">32 </option>
+                        <label>Capacity</label>
+                        <select name="capacity">
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                            <option value="8">8</option>
+                            <option value="16">16</option>
+                            <option value="32">32</option>
                         </select>
                     </div>
+
                     <div class="field">
-                        <label>Capacity</label>
-                        <input type="number" name="capacity">
+                        <label>RAM Type</label>
+                        <input type="text" name="ramtype">
                     </div>
 
                     <div class="field">
                         <label>Serial No</label>
                         <input type="text" name="serial_no">
                     </div>
+
                     <div class="field">
                         <label>Bus Speed</label>
                         <input type="text" name="bus_speed">
@@ -183,6 +186,7 @@ $active = "add_laptop";
                             <option value="No">No</option>
                         </select>
                     </div>
+
                     <div class="field">
                         <label>Camera</label>
                         <select name="camera">
@@ -207,6 +211,7 @@ $active = "add_laptop";
                             <option value="Ryzen 7">Ryzen 7</option>
                         </select>
                     </div>
+
                     <div class="field">
                         <label>Manufacturer</label>
                         <select name="processor_manufacturer">
@@ -215,33 +220,14 @@ $active = "add_laptop";
                         </select>
                     </div>
 
-                    <!-- <div class="field">
-                        <label>Processor Type</label>
-                        <select name="processor_type">
-                            <option value="Mobile">Mobile</option>
-                            <option value="Desktop">Desktop</option>
-                        </select>
-                    </div> -->
-                    <div class="field">
-                        <label>Micro Card</label>
-                        <input type="text" name="micro_card">
-                    </div>
-
                     <div class="field">
                         <label>Clock Speed</label>
                         <input type="text" name="clock_speed">
                     </div>
+
                     <div class="field">
                         <label>Series</label>
                         <input type="text" name="processor_series">
-                    </div>
-
-                    <div class="field">
-                        <label>Status</label>
-                        <select name="status">
-                            <!-- <option value="Serviceable">Serviceable</option> -->
-                            <option value="Unserviceable">Unserviceable</option>
-                        </select>
                     </div>
                 </div>
 
@@ -255,9 +241,11 @@ $active = "add_laptop";
                             <option value="HP">HP</option>
                             <option value="Lenovo">Lenovo</option>
                             <option value="ASUS">ASUS</option>
+                            <option value="MSI">MSI</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
+
                     <div class="field">
                         <label>Model</label>
                         <input type="text" name="motherboard_model">
@@ -282,22 +270,32 @@ $active = "add_laptop";
                             <option value="Other">Other</option>
                         </select>
                     </div>
+
                     <div class="field">
                         <label>Type</label>
                         <input type="text" name="storage_type">
                     </div>
 
                     <div class="field">
-                        <label>Form Factor</label>
-                        <select name="form_factor">
-                            <option value="2.5 inch">2.5 inch</option>
-                            <option value="3.5 inch">3.5 inch</option>
-                            <option value="M.2">M.2</option>
-                        </select>
+                        <label>Capacity</label>
+                        <input type="text" name="scapacity">
                     </div>
+
                     <div class="field">
                         <label>Model</label>
                         <input type="text" name="storage_model">
+                    </div>
+                </div>
+
+                <h2>Status</h2>
+
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="Serviceable">Serviceable</option>
+                            <!-- <option value="Unserviceable">Unserviceable</option> -->
+                        </select>
                     </div>
                 </div>
 
@@ -306,7 +304,7 @@ $active = "add_laptop";
                 <button type="submit" name="submit" class="btn-main">Add Laptop</button>
 
                 <div class="field" style="margin-top:20px;">
-                    <label>Upload Photo</label>
+                    <label>Upload Laptop Photo</label>
                     <input type="file" name="photo">
                 </div>
 
@@ -325,12 +323,14 @@ function updateLabOptions(preselect) {
     var max = (dept === 'Electrical Eng') ? 2 : 6;
 
     labSelect.innerHTML = '';
+
     for (var i = 1; i <= max; i++) {
         var opt = document.createElement('option');
         opt.value = 'Lab ' + i;
         opt.textContent = 'Lab ' + i;
         labSelect.appendChild(opt);
     }
+
     if (preselect) {
         labSelect.value = preselect;
     }
