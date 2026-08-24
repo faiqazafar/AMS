@@ -5,18 +5,45 @@ header("Content-Type: application/json");
 require_once "../connection.php";
 
 /*
- * API key will be stored in Railway Environment Variables.
+ * Get API key from Railway environment variable.
  */
 $apiKey = getenv("AMS_API_KEY");
 
 /*
  * Get Authorization header.
+ *
+ * PHP/Railway may expose it through different variables,
+ * so check several possibilities.
  */
-$headers = getallheaders();
+$authorization = '';
 
-$authorization = $headers["Authorization"] ?? "";
+if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+    $authorization = trim($_SERVER['HTTP_AUTHORIZATION']);
+} elseif (function_exists('getallheaders')) {
+    $headers = getallheaders();
 
-if (!$apiKey || $authorization !== "Bearer " . $apiKey) {
+    if (isset($headers['Authorization'])) {
+        $authorization = trim($headers['Authorization']);
+    } elseif (isset($headers['authorization'])) {
+        $authorization = trim($headers['authorization']);
+    }
+}
+
+/*
+ * Check API key.
+ */
+if (!$apiKey) {
+    http_response_code(500);
+
+    echo json_encode([
+        "success" => false,
+        "message" => "API key is not configured on the server"
+    ]);
+
+    exit;
+}
+
+if ($authorization !== "Bearer " . $apiKey) {
     http_response_code(401);
 
     echo json_encode([
@@ -40,7 +67,7 @@ $allowedTypes = [
 $type = $_GET["type"] ?? null;
 
 /*
- * If a specific type was requested.
+ * Specific asset type requested.
  */
 if ($type !== null) {
 
@@ -58,7 +85,6 @@ if ($type !== null) {
     $table = $allowedTypes[$type];
 
     $query = "SELECT * FROM `$table`";
-
     $result = mysqli_query($conn, $query);
 
     if (!$result) {
@@ -90,7 +116,7 @@ if ($type !== null) {
 
 /*
  * No type specified:
- * return all four asset categories.
+ * return all asset categories.
  */
 
 $data = [];
@@ -98,7 +124,6 @@ $data = [];
 foreach ($allowedTypes as $typeName => $table) {
 
     $query = "SELECT * FROM `$table`";
-
     $result = mysqli_query($conn, $query);
 
     if (!$result) {
