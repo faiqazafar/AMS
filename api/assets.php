@@ -3,6 +3,11 @@
 header("Content-Type: application/json");
 
 require_once "../connection.php";
+echo json_encode([
+    "api_key_exists" => getenv("AMS_API_KEY") !== false,
+    "authorization_header" => $_SERVER["HTTP_AUTHORIZATION"] ?? "NOT RECEIVED"
+]);
+exit;
 
 /*
  * Get API key from Railway environment variable.
