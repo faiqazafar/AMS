@@ -19,7 +19,7 @@ if (isset($_POST["submit"])) {
     } else {
 
         $pimsUrl = "https://ums-production-34b4.up.railway.app/api/login.php";
-        $pimsToken = getenv("123456789");
+        $pimsToken = getenv("PIMS_API_TOKEN");
 
         if (!$pimsToken) {
 
