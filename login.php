@@ -1,9 +1,9 @@
 <?php
-include "connection.php";
+
 session_start();
 
 if (isset($_SESSION["user_id"])) {
-    header("location: dashboard.php");
+    header("Location: dashboard.php");
     exit();
 }
 
@@ -11,29 +11,87 @@ $message = "";
 
 if (isset($_POST["submit"])) {
 
-    $email = $_POST["email"];
-    $password = $_POST["password"];
+    $email = trim($_POST["email"] ?? "");
+    $password = $_POST["password"] ?? "";
 
-    $query = "SELECT * FROM login WHERE email='$email' AND password='$password'";
-    $result = mysqli_query($conn, $query);
+    if ($email === "" || $password === "") {
+        $message = "Please enter email and password.";
+    } else {
 
-    if (mysqli_num_rows($result) > 0) {
+        $pimsUrl = "https://ums-production-34b4.up.railway.app/api/login.php";
+        $pimsToken = getenv("123456789");
 
-        $row = mysqli_fetch_assoc($result);
+        if (!$pimsToken) {
 
-        $_SESSION["user_id"] = $email;
-        $_SESSION["fullname"] = $row["fullname"];
-        $_SESSION["photo"] = isset($row["photo"]) ? $row["photo"] : "";
+            $message = "PIMS API configuration error.";
 
-        header("location: dashboard.php");
-        exit();
-    }
-    else {
-        $message = "Wrong email or password.";
+        } else {
+
+            $requestData = [
+                "email" => $email,
+                "password" => $password
+            ];
+
+            $ch = curl_init($pimsUrl);
+
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt(
+                $ch,
+                CURLOPT_POSTFIELDS,
+                json_encode($requestData)
+            );
+
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                "Authorization: Bearer " . $pimsToken,
+                "Content-Type: application/json"
+            ]);
+
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            if ($response === false) {
+
+                $message = "Unable to connect to PIMS.";
+
+            } else {
+
+                $result = json_decode($response, true);
+
+                if (
+                    $httpCode >= 200 &&
+                    $httpCode < 300 &&
+                    isset($result["success"]) &&
+                    $result["success"] === true
+                ) {
+
+                    /*
+                     * PIMS authentication successful.
+                     */
+
+                    $user = $result["data"]["user"] ?? [];
+
+                    $_SESSION["user_id"] = $user["id"] ?? $email;
+                    $_SESSION["fullname"] = $user["name"] ?? "Admin";
+                    $_SESSION["email"] = $user["email"] ?? $email;
+                    $_SESSION["role"] = $user["role"] ?? "admin";
+
+                    header("Location: dashboard.php");
+                    exit();
+
+                } else {
+
+                    $message = $result["message"] ?? "Invalid email or password.";
+                }
+            }
+
+            curl_close($ch);
+        }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
