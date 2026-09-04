@@ -624,6 +624,17 @@ table tr:last-child td { border-bottom: none; }
 .status-working { background: #dcfce7; color: #15803d; }
 .status-faulty { background: #fee2e2; color: #b91c1c; }
 .status-repair { background: #fef3c7; color: #b45309; }
+.status-serviceable { background: #dcfce7; color: #15803d; }
+.status-unserviceable { background: #fee2e2; color: #b91c1c; }
+
+/* ---------- Responsive tables ---------- */
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.table-responsive table { min-width: 720px; }
 
 /* ---------- Entrance animation ---------- */
 
@@ -738,10 +749,30 @@ table tr:last-child td { border-bottom: none; }
 @media (max-width: 900px) {
     .app-shell { flex-direction: column; }
     .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; flex-wrap: wrap; }
+    .sidebar-brand { width: 100%; }
+    .sidebar-photo-upload { width: 100%; padding: 8px 16px !important; }
     .sidebar-nav { flex-direction: row; flex-wrap: wrap; }
     .sidebar-footer { margin-left: auto; border-top: none; }
     .stat-strip { grid-template-columns: repeat(2, 1fr); }
     .main { padding: 22px; }
+    .category-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+}
+
+@media (max-width: 560px) {
+    .main { padding: 16px; }
+    .topbar { flex-direction: column; align-items: flex-start; }
+    .topbar h1 { font-size: 21px; }
+    .stat-strip { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-card { padding: 14px 14px 12px 14px; }
+    .stat-card .stat-num { font-size: 22px; }
+    .category-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .category-card { padding: 16px 16px 14px 16px; }
+    .panel { padding: 16px; }
+    .filter-form { flex-direction: column; align-items: stretch; gap: 10px; }
+    .filter-form .field { min-width: 0; width: 100%; }
+    .filter-form .btn-main { width: 100%; justify-content: center; }
+    .lab-bar-row { grid-template-columns: 64px 1fr 28px; gap: 8px; }
+    .btn-main, .btn-ghost { padding: 9px 14px; font-size: 13px; }
 }
 
 /* ---------- ITAMS monochrome refresh ---------- */
@@ -933,4 +964,9 @@ table th { background:#111; color:#fff; } table tr:hover td { background:#f5f5f5
     .auth-form-side .container {
         max-width: 440px;
     }
+}
+
+@media (max-width: 480px) {
+    .auth-form-side { padding: 20px; }
+    .auth-form-side .container { padding: 28px 22px; }
 }

@@ -2,20 +2,7 @@
 if (!isset($active)) {
     $active = "";
 }
-
-$sidebar_photo_message = "";
-if (isset($_POST["upload_profile_photo"])) {
-    $photo = $_FILES["photo"]["name"] ?? "";
-    if ($photo != "") {
-        move_uploaded_file($_FILES["photo"]["tmp_name"], "files/" . $photo);
-        $photo_escaped = mysqli_real_escape_string($conn, $photo);
-        $email_escaped = mysqli_real_escape_string($conn, $_SESSION["user_id"]);
-        if (mysqli_query($conn, "UPDATE login SET photo='$photo_escaped' WHERE email='$email_escaped'")) {
-            $_SESSION["photo"] = $photo;
-            $sidebar_photo_message = "Photo uploaded successfully.";
-        }
-    }
-}
+// Profile photo is populated via database import — no upload UI here.
 ?>
 
 <aside class="sidebar">
@@ -34,11 +21,6 @@ if (isset($_POST["upload_profile_photo"])) {
         <?php } else { ?>
             <span class="sidebar-profile-initial" style="width:72px;height:72px;font-size:26px;margin:0 auto;"><?php echo strtoupper(substr($_SESSION["fullname"] ?? "A", 0, 1)); ?></span>
         <?php } ?>
-        <form method="POST" enctype="multipart/form-data" style="margin-top:10px;">
-            <input type="file" name="photo" required style="width:100%; font-size:12px;">
-            <button type="submit" name="upload_profile_photo" class="btn-main" style="width:100%; margin-top:8px;">Upload Photo</button>
-        </form>
-        <?php if ($sidebar_photo_message != "") { ?><small><?php echo $sidebar_photo_message; ?></small><?php } ?>
     </div>
 
     <nav class="sidebar-nav">
@@ -96,12 +78,12 @@ if (isset($_POST["upload_profile_photo"])) {
 
         <span class="nav-label">Status</span>
 
-        <a href="dashboard.php?view=working&status=Serviceable" class="nav-item <?php if ($active == 'serviceable') echo 'active'; ?>">
+        <a href="serviceable.php" class="nav-item <?php if ($active == 'serviceable') echo 'active'; ?>">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="9 12 11 14 15 10"></polyline></svg>
             Serviceable
         </a>
 
-        <a href="dashboard.php?view=working&status=Unserviceable" class="nav-item <?php if ($active == 'unserviceable') echo 'active'; ?>">
+        <a href="unserviceable.php" class="nav-item <?php if ($active == 'unserviceable') echo 'active'; ?>">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="9.5" y1="9.5" x2="14.5" y2="14.5"></line><line x1="14.5" y1="9.5" x2="9.5" y2="14.5"></line></svg>
             Unserviceable
         </a>

@@ -40,35 +40,19 @@ $total_unserviceable =
     get_status_count($conn, "printer", "Unserviceable") +
     get_status_count($conn, "projector", "Unserviceable");
 
-// The "Serviceable" / "Unserviceable" sidebar links point here with
-// ?view=working&status=..., which reveals the matching items below
-// and highlights the right nav item.
-$show_working = (isset($_GET['view']) && $_GET['view'] == 'working');
-
-$status_param = "Serviceable";
-if (isset($_GET['status']) && $_GET['status'] == "Unserviceable") {
-    $status_param = "Unserviceable";
-}
-
-if ($show_working) {
-    $desktop_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM desktop WHERE status='$status_param'");
-    $laptop_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM laptop WHERE status='$status_param'");
-    $printer_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM printer WHERE status='$status_param'");
-    $projector_working = mysqli_query($conn, "SELECT asset_tag, department, brand, model, status FROM projector WHERE status='$status_param'");
-}
-
 // numbers for the serviceable / unserviceable chart on the dashboard
 $chart_total = $total_serviceable + $total_unserviceable;
 $service_pct = $chart_total > 0 ? round(($total_serviceable / $chart_total) * 100) : 0;
 $unservice_pct = $chart_total > 0 ? (100 - $service_pct) : 0;
 
-$active = $show_working ? strtolower($status_param) : "dashboard";
+$active = "dashboard";
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Dashboard - ITAMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -182,93 +166,6 @@ $active = $show_working ? strtolower($status_param) : "dashboard";
         </div>
 
 
-        <?php if ($show_working) { ?>
-
-        <div class="section-heading"><?php echo htmlspecialchars($status_param); ?> Items</div>
-
-        <div class="panel">
-            <h2><?php echo htmlspecialchars($status_param); ?> Desktop</h2>
-            <table>
-                <tr>
-                    <th>Registration No</th>
-                    <th>Department</th>
-                    <th>Brand</th>
-                    <th>Model</th>
-                </tr>
-                <?php while ($row = mysqli_fetch_assoc($desktop_working)) { ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($row["asset_tag"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["department"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["brand"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["model"]); ?></td>
-                    </tr>
-                <?php } ?>
-            </table>
-        </div>
-
-        <div class="panel">
-            <h2><?php echo htmlspecialchars($status_param); ?> Laptop</h2>
-            <table>
-                <tr>
-                    <th>Registration No</th>
-                    <th>Department</th>
-                    <th>Brand</th>
-                    <th>Model</th>
-                </tr>
-                <?php while ($row = mysqli_fetch_assoc($laptop_working)) { ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($row["asset_tag"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["department"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["brand"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["model"]); ?></td>
-                    </tr>
-                <?php } ?>
-            </table>
-        </div>
-
-        <div class="panel">
-            <h2><?php echo htmlspecialchars($status_param); ?> Printer</h2>
-            <table>
-                <tr>
-                    <th>Registration No</th>
-                    <th>Department</th>
-                    <th>Brand</th>
-                    <th>Model</th>
-                </tr>
-                <?php while ($row = mysqli_fetch_assoc($printer_working)) { ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($row["asset_tag"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["department"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["brand"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["model"]); ?></td>
-                    </tr>
-                <?php } ?>
-            </table>
-        </div>
-
-        <div class="panel">
-            <h2><?php echo htmlspecialchars($status_param); ?> Projector</h2>
-            <table>
-                <tr>
-                    <th>Registration No</th>
-                    <th>Department</th>
-                    <th>Brand</th>
-                    <th>Model</th>
-                </tr>
-                <?php while ($row = mysqli_fetch_assoc($projector_working)) { ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($row["asset_tag"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["department"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["brand"]); ?></td>
-                        <td><?php echo htmlspecialchars($row["model"]); ?></td>
-                    </tr>
-                <?php } ?>
-            </table>
-        </div>
-
-        <?php } ?>
-
-        
     </main>
 
 </div>

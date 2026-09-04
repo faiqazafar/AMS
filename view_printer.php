@@ -29,6 +29,7 @@ $active = "printer";
 <html>
 <head>
     <title>View Printer - ITAMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -61,7 +62,6 @@ $active = "printer";
                     <label>Lab</label>
                     <select name="lab" id="lab"></select>
                 </div>
-                <button type="submit" class="btn-main">View</button>
             </form>
         </div>
 
@@ -69,6 +69,7 @@ $active = "printer";
 
             <?php if (mysqli_num_rows($result) > 0) { ?>
 
+                <div class="table-responsive">
                 <table>
                     <tr>
                         <th>Registration No</th>
@@ -112,6 +113,7 @@ $active = "printer";
                     <?php } ?>
 
                 </table>
+                </div>
 
             <?php } else { ?>
                 <div class="empty-state">No printer added yet.</div>
@@ -123,39 +125,18 @@ $active = "printer";
 
 </div>
 
+<script src="js/labs.js"></script>
 <script>
-function updateLabOptions(preselect) {
-    var dept = document.getElementById('department').value;
-    var labSelect = document.getElementById('lab');
-
-    labSelect.innerHTML = '';
-
-    var allOpt = document.createElement('option');
-    allOpt.value = '';
-    allOpt.textContent = 'All Labs';
-    labSelect.appendChild(allOpt);
-
-    if (dept === '') {
-        return;
-    }
-
-    var max = (dept === 'Electrical Eng') ? 2 : 6;
-    for (var i = 1; i <= max; i++) {
-        var opt = document.createElement('option');
-        opt.value = 'Lab ' + i;
-        opt.textContent = 'Lab ' + i;
-        labSelect.appendChild(opt);
-    }
-    if (preselect) {
-        labSelect.value = preselect;
-    }
-}
-
 document.getElementById('department').addEventListener('change', function () {
-    updateLabOptions();
+    loadLabOptions('department', 'lab', '', true);
+    this.form.submit();
 });
 
-updateLabOptions(<?php echo json_encode($filter_lab); ?>);
+document.getElementById('lab').addEventListener('change', function () {
+    this.form.submit();
+});
+
+loadLabOptions('department', 'lab', <?php echo json_encode($filter_lab); ?>, true);
 </script>
 
 </body>

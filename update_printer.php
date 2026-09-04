@@ -85,6 +85,7 @@ $active = "printer";
 <html>
 <head>
     <title>Update Printer - ITAMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -190,12 +191,13 @@ $active = "printer";
 
                 <br>
 
-                <button type="submit" name="update" class="btn-main">Update Printer</button>
-
                 <div class="field" style="margin-top:20px;">
                     <label>Upload Printer Photo</label>
-                    <input type="file" name="photo">
+                    <input type="file" name="photo" accept="image/*">
                 </div>
+                <br>
+
+                <button type="submit" name="update" class="btn-main">Update Printer</button>
 
             </form>
         </div>
@@ -210,32 +212,14 @@ $active = "printer";
 
 </div>
 
+<script src="js/labs.js"></script>
 <script>
-function updateLabOptions(preselect) {
-    var dept = document.getElementById('department').value;
-    var labSelect = document.getElementById('lab');
-    var max = (dept === 'Electrical Eng') ? 2 : 6;
-
-    labSelect.innerHTML = '';
-
-    for (var i = 1; i <= max; i++) {
-        var opt = document.createElement('option');
-        opt.value = 'Lab ' + i;
-        opt.textContent = 'Lab ' + i;
-        labSelect.appendChild(opt);
-    }
-
-    if (preselect) {
-        labSelect.value = preselect;
-    }
-}
-
 if (document.getElementById('department')) {
     document.getElementById('department').addEventListener('change', function () {
-        updateLabOptions();
+        loadLabOptions('department', 'lab', '', false);
     });
 
-    updateLabOptions(<?php echo !empty($asset) ? json_encode($asset['lab']) : '""'; ?>);
+    loadLabOptions('department', 'lab', <?php echo !empty($asset) ? json_encode($asset['lab']) : '""'; ?>, false);
 }
 </script>
 

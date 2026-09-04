@@ -25,7 +25,7 @@ if (isset($_POST["update"])) {
     $brand = $_POST["brand"];
     $model = $_POST["model"];
     $series = $_POST["series"];
-    $ram = $_POST["ram"];
+    $ram = $_POST["ramtype"];
     $capacity = $_POST["capacity"];
     $serial_no = $_POST["serial_no"];
     $bus_speed = $_POST["bus_speed"];
@@ -33,7 +33,6 @@ if (isset($_POST["update"])) {
     $camera = $_POST["camera"];
     $processor = $_POST["processor"];
     $processor_manufacturer = $_POST["processor_manufacturer"];
-    $micro_card = $_POST["micro_card"];
     $clock_speed = $_POST["clock_speed"];
     $processor_series = $_POST["processor_series"];
     $status = $_POST["status"];
@@ -42,7 +41,7 @@ if (isset($_POST["update"])) {
     $motherboard_series = $_POST["motherboard_series"];
     $storage_manufacturer = $_POST["storage_manufacturer"];
     $storage_type = $_POST["storage_type"];
-    $form_factor = $_POST["form_factor"];
+    $storage_capacity = $_POST["scapacity"];
     $storage_model = $_POST["storage_model"];
 
     // $asset_tag = mysqli_real_escape_string($conn, $asset_tag);
@@ -87,7 +86,7 @@ if (isset($_POST["update"])) {
         brand='$brand',
         model='$model',
         series='$series',
-        ram='$ram',
+        ramtype='$ram',
         capacity='$capacity',
         serial_no='$serial_no',
         bus_speed='$bus_speed',
@@ -95,7 +94,6 @@ if (isset($_POST["update"])) {
         camera='$camera',
         processor='$processor',
         processor_manufacturer='$processor_manufacturer',
-        micro_card='$micro_card',
         clock_speed='$clock_speed',
         processor_series='$processor_series',
         status='$status',
@@ -104,7 +102,7 @@ if (isset($_POST["update"])) {
         motherboard_series='$motherboard_series',
         storage_manufacturer='$storage_manufacturer',
         storage_type='$storage_type',
-        form_factor='$form_factor',
+        S_capacity='$storage_capacity',
         storage_model='$storage_model'
         $photo_sql
         WHERE id='$id'";
@@ -127,6 +125,7 @@ $active = "laptop";
 <html>
 <head>
     <title>Update Laptop - ITAMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -192,14 +191,16 @@ $active = "laptop";
                     </div>
 
                     <div class="field">
-                        <label>RAM</label>
-                        <input type="text" name="ram" value="<?php echo htmlspecialchars($asset['ram']); ?>">
+                        <label>RAM Type</label>
+                        <input type="text" name="ram" value="<?php echo htmlspecialchars($asset['ramtype']); ?>">
                     </div>
 
                     <div class="field">
                         <label>Capacity</label>
-                        <input type="number" name="capacity" value="<?php echo htmlspecialchars($asset['capacity']); ?>">
+                        <input type="text" name="capacity" value="<?php echo htmlspecialchars($asset['capacity']); ?>">
                     </div>
+
+                    
 
                     <div class="field">
                         <label>Serial No</label>
@@ -252,10 +253,10 @@ $active = "laptop";
                         </select>
                     </div>
 
-                    <div class="field">
+                    <!-- <div class="field">
                         <label>Micro Card</label>
                         <input type="text" name="micro_card" value="<?php echo htmlspecialchars($asset['micro_card']); ?>">
-                    </div>
+                    </div> -->
 
                     <div class="field">
                         <label>Clock Speed</label>
@@ -301,14 +302,10 @@ $active = "laptop";
                     </div>
 
                     <div class="field">
-                        <label>Form Factor</label>
-                        <select name="form_factor">
-                            <option value="2.5 inch" <?php echo ($asset['form_factor'] == '2.5 inch') ? 'selected' : ''; ?>>2.5 inch</option>
-                            <option value="3.5 inch" <?php echo ($asset['form_factor'] == '3.5 inch') ? 'selected' : ''; ?>>3.5 inch</option>
-                            <option value="M.2" <?php echo ($asset['form_factor'] == 'M.2') ? 'selected' : ''; ?>>M.2</option>
-                        </select>
+                        <label>Capacity</label>
+                        <input type="text" name="scapacity" value="<?php echo htmlspecialchars($asset['S_capacity']); ?>">
                     </div>
-
+                    
                     <div class="field">
                         <label>Model</label>
                         <input type="text" name="storage_model" value="<?php echo htmlspecialchars($asset['storage_model']); ?>">
@@ -325,12 +322,13 @@ $active = "laptop";
 
                 <br>
 
-                <button type="submit" name="update" class="btn-main">Update Laptop</button>
-
                 <div class="field" style="margin-top:20px;">
                     <label>Upload Laptop Photo</label>
-                    <input type="file" name="photo">
+                    <input type="file" name="photo" accept="image/*">
                 </div>
+                <br>
+
+                <button type="submit" name="update" class="btn-main">Update Laptop</button>
 
             </form>
         </div>
@@ -345,32 +343,14 @@ $active = "laptop";
 
 </div>
 
+<script src="js/labs.js"></script>
 <script>
-function updateLabOptions(preselect) {
-    var dept = document.getElementById('department').value;
-    var labSelect = document.getElementById('lab');
-    var max = (dept === 'Electrical Eng') ? 2 : 6;
-
-    labSelect.innerHTML = '';
-
-    for (var i = 1; i <= max; i++) {
-        var opt = document.createElement('option');
-        opt.value = 'Lab ' + i;
-        opt.textContent = 'Lab ' + i;
-        labSelect.appendChild(opt);
-    }
-
-    if (preselect) {
-        labSelect.value = preselect;
-    }
-}
-
 if (document.getElementById('department')) {
     document.getElementById('department').addEventListener('change', function () {
-        updateLabOptions();
+        loadLabOptions('department', 'lab', '', false);
     });
 
-    updateLabOptions(<?php echo !empty($asset) ? json_encode($asset['lab']) : '""'; ?>);
+    loadLabOptions('department', 'lab', <?php echo !empty($asset) ? json_encode($asset['lab']) : '""'; ?>, false);
 }
 </script>
 

@@ -27,7 +27,7 @@ if (isset($_POST["update"])) {
     $brand = $_POST["brand"];
     $model = $_POST["model"];
     $series = $_POST["series"];
-    $ram = $_POST["ram"];
+    $ram = $_POST["ramtype"];
     $capacity = $_POST["capacity"];
     $serial_no = $_POST["serial_no"];
     $bus_speed = $_POST["bus_speed"];
@@ -91,7 +91,7 @@ if (isset($_POST["update"])) {
         brand='$brand',
         model='$model',
         series='$series',
-        ram='$ram',
+        ramtype='$ram',
         capacity='$capacity',
         serial_no='$serial_no',
         bus_speed='$bus_speed',
@@ -132,6 +132,7 @@ $active = "desktop";
 <html>
 <head>
     <title>Update Desktop - ITAMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -364,32 +365,14 @@ $active = "desktop";
 
 </div>
 
+<script src="js/labs.js"></script>
 <script>
-function updateLabOptions(preselect) {
-    var dept = document.getElementById('department').value;
-    var labSelect = document.getElementById('lab');
-    var max = (dept === 'Electrical Eng') ? 2 : 6;
-
-    labSelect.innerHTML = '';
-
-    for (var i = 1; i <= max; i++) {
-        var opt = document.createElement('option');
-        opt.value = 'Lab ' + i;
-        opt.textContent = 'Lab ' + i;
-        labSelect.appendChild(opt);
-    }
-
-    if (preselect) {
-        labSelect.value = preselect;
-    }
-}
-
 if (document.getElementById('department')) {
     document.getElementById('department').addEventListener('change', function () {
-        updateLabOptions();
+        loadLabOptions('department', 'lab', '', false);
     });
 
-    updateLabOptions(<?php echo !empty($asset) ? json_encode($asset['lab']) : '""'; ?>);
+    loadLabOptions('department', 'lab', <?php echo !empty($asset) ? json_encode($asset['lab']) : '""'; ?>, false);
 }
 </script>
 

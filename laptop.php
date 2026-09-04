@@ -28,8 +28,8 @@ if (isset($_POST["submit"])) {
     $brand = $_POST["brand"];
     $model = $_POST["model"];
     $series = $_POST["series"];
-    $capacity = $_POST["capacity"] . " GB";
     $ram = $_POST["ramtype"];
+    $capacity = $_POST["capacity"] . " GB";
     $serial_no = $_POST["serial_no"];
     $bus_speed = $_POST["bus_speed"];
     $wifi = $_POST["wifi"];
@@ -54,7 +54,7 @@ if (isset($_POST["submit"])) {
     }
 
     $sql = "INSERT INTO laptop
-    (asset_tag, department, lab, brand, model, series, ram, capacity, serial_no,
+    (asset_tag, department, lab, brand, model, series, ramtype, capacity, serial_no,
     bus_speed, wifi, camera, processor, processor_manufacturer, clock_speed,
     processor_series, motherboard_manufacturer, motherboard_model, motherboard_series,
     storage_manufacturer, storage_type, S_capacity, storage_model, status, photo)
@@ -83,6 +83,7 @@ $active = "add_laptop";
 <html>
 <head>
     <title>Add Laptop - ITAMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -154,6 +155,11 @@ $active = "add_laptop";
                     </div>
 
                     <div class="field">
+                        <label>RAM Type</label>
+                        <input type="text" name="ramtype">
+                    </div>
+
+                    <div class="field">
                         <label>Capacity</label>
                         <select name="capacity">
                             <option value="2">2</option>
@@ -163,11 +169,7 @@ $active = "add_laptop";
                             <option value="32">32</option>
                         </select>
                     </div>
-
-                    <div class="field">
-                        <label>RAM Type</label>
-                        <input type="text" name="ramtype">
-                    </div>
+                    
 
                     <div class="field">
                         <label>Serial No</label>
@@ -301,12 +303,13 @@ $active = "add_laptop";
 
                 <br>
 
-                <button type="submit" name="submit" class="btn-main">Add Laptop</button>
-
                 <div class="field" style="margin-top:20px;">
                     <label>Upload Laptop Photo</label>
-                    <input type="file" name="photo">
+                    <input type="file" name="photo" accept="image/*">
                 </div>
+                <br>
+
+                <button type="submit" name="submit" class="btn-main">Add Laptop</button>
 
             </form>
 
@@ -316,31 +319,13 @@ $active = "add_laptop";
 
 </div>
 
+<script src="js/labs.js"></script>
 <script>
-function updateLabOptions(preselect) {
-    var dept = document.getElementById('department').value;
-    var labSelect = document.getElementById('lab');
-    var max = (dept === 'Electrical Eng') ? 2 : 6;
-
-    labSelect.innerHTML = '';
-
-    for (var i = 1; i <= max; i++) {
-        var opt = document.createElement('option');
-        opt.value = 'Lab ' + i;
-        opt.textContent = 'Lab ' + i;
-        labSelect.appendChild(opt);
-    }
-
-    if (preselect) {
-        labSelect.value = preselect;
-    }
-}
-
 document.getElementById('department').addEventListener('change', function () {
-    updateLabOptions();
+    loadLabOptions('department', 'lab', '', false);
 });
 
-updateLabOptions();
+loadLabOptions('department', 'lab', '', false);
 </script>
 
 </body>
