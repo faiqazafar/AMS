@@ -748,11 +748,27 @@ table tr:last-child td { border-bottom: none; }
 
 @media (max-width: 900px) {
     .app-shell { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; flex-wrap: wrap; }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        position: relative;
+        flex-direction: column;
+    }
     .sidebar-brand { width: 100%; }
     .sidebar-photo-upload { width: 100%; padding: 8px 16px !important; }
-    .sidebar-nav { flex-direction: row; flex-wrap: wrap; }
-    .sidebar-footer { margin-left: auto; border-top: none; }
+    .sidebar-nav {
+        flex: none;
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        overflow: visible;
+        max-height: none;
+        min-height: 0;
+    }
+    .sidebar-nav .nav-label { width: 100%; margin: 10px 4px 4px; }
+    .sidebar-footer { width: 100%; margin-left: 0; }
     .stat-strip { grid-template-columns: repeat(2, 1fr); }
     .main { padding: 22px; }
     .category-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
