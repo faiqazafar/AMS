@@ -768,11 +768,6 @@ table tr:last-child td { border-bottom: none; }
 .container p.mt-3 a { color: #ec4899; font-weight: 700; text-decoration: none; }
 .container p.mt-3 a:hover { text-decoration: underline; }
 
-@media (max-width: 900px) {
-    .auth-visual { display: none; }
-    .auth-form-side { width: 100%; }
-}
-
 /* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {
@@ -1035,3 +1030,15 @@ table th { background:#111; color:#fff; } table tr:hover td { background:#f5f5f5
     .auth-form-side { padding: 20px; }
     .auth-form-side .container { padding: 28px 22px; }
 }
+
+/* ---------- Auth screen mobile fix (kept last so it always wins) ---------- */
+@media (max-width: 900px) {
+    .auth-shell { flex-direction: column; min-height: 100vh; }
+    .auth-visual { display: none !important; }
+    .auth-form-side {
+        width: 100% !important;
+        min-height: 100vh;
+        padding: 24px !important;
+    }
+}
+
