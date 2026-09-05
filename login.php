@@ -96,7 +96,23 @@ if (isset($_POST["submit"])) {
 <html>
 <head>
     <title>Login - IT Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        @media (max-width: 900px) {
+            .auth-shell { flex-direction: column !important; min-height: 100vh; }
+            .auth-visual { display: none !important; }
+            .auth-form-side {
+                width: 100% !important;
+                min-height: 100vh !important;
+                padding: 24px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+            .auth-form-side .container { width: 100%; max-width: 420px; }
+        }
+    </style>
 </head>
 <body>
 
