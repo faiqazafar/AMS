@@ -13,7 +13,13 @@ if (!isset($active)) {
             <strong>ITAMS</strong>
             <small>IT Management System</small>
         </div>
+
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="sidebarMenu">
+            <span></span><span></span><span></span>
+        </button>
     </div>
+
+    <div class="sidebar-menu" id="sidebarMenu">
 
     <div class="sidebar-photo-upload" style="text-align:center; padding:12px 16px 6px;">
         <?php if (!empty($_SESSION["photo"]) && file_exists("files/" . $_SESSION["photo"])) { ?>
@@ -98,4 +104,21 @@ if (!isset($active)) {
         </a>
     </div>
 
+    </div>
+
 </aside>
+
+<script>
+(function () {
+    var toggle = document.getElementById('navToggle');
+    var menu = document.getElementById('sidebarMenu');
+
+    if (toggle && menu) {
+        toggle.addEventListener('click', function () {
+            var isOpen = menu.classList.toggle('open');
+            toggle.classList.toggle('active', isOpen);
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+    }
+})();
+</script>
