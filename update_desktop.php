@@ -341,15 +341,17 @@ $active = "desktop";
                         </select>
                     </div>
                 </div>
-
-                <br>
-
-                <button type="submit" name="update" class="btn-main">Update Desktop</button>
-
+                 
                 <div class="field" style="margin-top:20px;">
                     <label>Upload Desktop Photo</label>
                     <input type="file" name="photo">
                 </div>
+            
+                <br>
+
+                <button type="submit" name="update" class="btn-main">Update Desktop</button>
+
+                
 
             </form>
 
